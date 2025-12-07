@@ -1,0 +1,13 @@
+{
+    "welcome": "Hello {name}! Welcome to Anime Sage. I am your AI-powered anime guide.",
+    "help_text": "📜 **Command List**:\n/recommend [request] - Get AI anime recommendation (Ex: /recommend like Naruto)\n/setgenres [genres] - Save favorite genres\n/setmood [mood] - Save current mood\n/resetprefs - Reset profile\n/stats - Statistics\n/adminpanel - Admin Panel",
+    "genres_set": "✅ Favorite genres saved: {genres}",
+    "mood_set": "✅ Mood saved: {mood}",
+    "reset_done": "🔄 Preferences reset.",
+    "stats_msg": "📊 **Group Stats**:\n👥 Users: {users}\n🔄 Total Recommendations: {total}",
+    "lang_changed": "🇬🇧 Language set to English.",
+    "admin_only": "❌ Only admins can use this command.",
+    "select_lang": "Please select a language:",
+    "admin_panel_title": "🔧 **Admin Panel**\nManage group settings here.",
+    "thinking": "🧠 **Anime Sage is thinking...**"
+}

@@ -1,0 +1,13 @@
+{
+    "welcome": "Merhaba {name}! Anime Sage'e hoş geldiniz. Ben AI destekli anime rehberinizim.",
+    "help_text": "📜 **Komut Listesi**:\n/recommend [istek] - Yapay zekadan anime önerisi al (Örn: /recommend Naruto gibi)\n/setgenres [türler] - Sevdiğin türleri kaydet\n/setmood [mood] - Ruh halini kaydet\n/resetprefs - Ayarları sıfırla\n/stats - İstatistikler\n/adminpanel - Yönetici Paneli",
+    "genres_set": "✅ Favori türleriniz hafızaya alındı: {genres}",
+    "mood_set": "✅ Ruh haliniz hafızaya alındı: {mood}",
+    "reset_done": "🔄 Tercihleriniz sıfırlandı.",
+    "stats_msg": "📊 **Grup İstatistikleri**:\n👥 Kullanıcı: {users}\n🔄 Toplam Öneri: {total}",
+    "lang_changed": "🇹🇷 Dil Türkçe olarak ayarlandı.",
+    "admin_only": "❌ Bu komutu sadece yöneticiler kullanabilir.",
+    "select_lang": "Lütfen bir dil seçin / Please select a language:",
+    "admin_panel_title": "🔧 **Yönetici Paneli**\nBuradan grup ayarlarını yönetebilirsiniz.",
+    "thinking": "🧠 **Anime Sage düşünüyor...**"
+}
