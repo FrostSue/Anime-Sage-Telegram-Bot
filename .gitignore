@@ -1,0 +1,55 @@
+# --- Python Temel ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# --- Sanal Ortamlar (Virtual Env) ---
+env/
+venv/
+.env/
+.venv/
+ENV/
+
+# --- Çevre Değişkenleri (ÇOK ÖNEMLİ) ---
+.env
+.env.*
+!.env.example
+
+# --- Pyrogram & Telegram Session Dosyaları ---
+# Bu dosyalar giriş bilgilerini tutar, ASLA paylaşılmamalı
+*.session
+*.session-journal
+*.session-*
+
+# --- Veritabanı (SQLite) ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Loglar ve Hata Kayıtları ---
+*.log
+logs/
+errors/
+debug.log
+
+# --- IDE ve Editör Dosyaları ---
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.project
+.settings/
+
+# --- Test ve Cache ---
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- İndirilen Medyalar (Botun indireceği dosyalar) ---
+downloads/
+cache/
+temp/
