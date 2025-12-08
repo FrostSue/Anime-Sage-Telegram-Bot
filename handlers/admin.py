@@ -6,14 +6,14 @@ import platform
 from pyrogram import Client
 from pyrogram.types import Message
 from app.config import ADMIN_IDS
-from database.db import get_global_stats
+from database.db import get_global_stats, add_sudo, del_sudo
+from utils.auth import is_admin
 
 def get_readable_time(seconds: int) -> str:
     count = 0
     ping_time = ""
     time_list = []
     time_suffix_list = ["s", "m", "h", "days"]
-
     while count < 4:
         count += 1
         remainder, result = divmod(seconds, 60) if count < 3 else divmod(seconds, 24)
@@ -21,51 +21,43 @@ def get_readable_time(seconds: int) -> str:
             break
         time_list.append(int(result))
         seconds = int(remainder)
-
     for x in range(len(time_list)):
         time_list[x] = str(time_list[x]) + time_suffix_list[x]
     if len(time_list) == 4:
         ping_time += time_list.pop() + ", "
-
     time_list.reverse()
     ping_time += ":".join(time_list)
     return ping_time
 
 async def server_info(c: Client, m: Message):
-    if m.from_user.id not in ADMIN_IDS:
+    if not await is_admin(m.from_user.id):
         return
 
     uname = platform.uname()
     os_name = f"{uname.system} {uname.release}"
     host_name = uname.node
     kernel = uname.release
-    
     boot_time_timestamp = psutil.boot_time()
     uptime_seconds = int(time.time() - boot_time_timestamp)
     uptime_str = get_readable_time(uptime_seconds)
-
     cpu_freq = psutil.cpu_freq()
     cpu_freq_str = f"{cpu_freq.current:.2f} Mhz" if cpu_freq else "N/A"
     cpu_count = psutil.cpu_count(logical=True)
     cpu_percent = psutil.cpu_percent(interval=0.1)
-
     mem = psutil.virtual_memory()
     mem_total = f"{mem.total / (1024 ** 3):.2f} GiB"
     mem_used = f"{mem.used / (1024 ** 3):.2f} GiB"
     mem_percent = mem.percent
-
     disk = psutil.disk_usage('/')
     disk_total = f"{disk.total / (1024 ** 3):.2f} GiB"
     disk_used = f"{disk.used / (1024 ** 3):.2f} GiB"
     disk_percent = disk.percent
-    
     swap = psutil.swap_memory()
     swap_total = f"{swap.total / (1024 ** 3):.2f} GiB"
     swap_used = f"{swap.used / (1024 ** 3):.2f} GiB"
     swap_percent = swap.percent
-
     py_ver = sys.version.split()[0]
-    
+
     msg = f"""
 **🖥️ Server Status**
 ```text
@@ -83,11 +75,10 @@ Swap:    {swap_used} / {swap_total} ({swap_percent}%)
 Local IP: Hidden
 ```
 """
-
     await m.reply_text(msg, quote=True)
 
 async def log_file_handler(c: Client, m: Message):
-    if m.from_user.id not in ADMIN_IDS:
+    if not await is_admin(m.from_user.id):
         return
 
     log_file = "anime_sage.log"
@@ -103,27 +94,59 @@ async def log_file_handler(c: Client, m: Message):
 
         await m.reply_document(
             document=log_file,
-            caption=f"📜 **System Logs**\n\n**Last Lines:**\n```\n{last_lines}```"
+            caption=f"📜 System Logs\n\nLast Lines:\n\n{last_lines}"
         )
     except Exception as e:
         await m.reply_text(f"Error reading logs: {str(e)}", quote=True)
 
 async def admin_panel(c: Client, m: Message):
-    if m.from_user.id not in ADMIN_IDS:
+    if not await is_admin(m.from_user.id):
         return
 
     total_users, total_recs = await get_global_stats()
 
     msg = (
-        f"👮‍♂️ **Admin Control Panel**\n"
+        f"👮‍♂️ Admin Control Panel\n"
         f"──────────────────────\n"
-        f"👥 **Total Users:** `{total_users}`\n"
-        f"🤖 **Total Recs:** `{total_recs}`\n"
+        f"👥 Total Users: {total_users}\n"
+        f"🤖 Total Recs: {total_recs}\n"
         f"──────────────────────\n"
-        f"📡 **Status:** Online ✅\n\n"
+        f"📡 Status: Online ✅\n\n"
         f"Commands:\n"
-        f"• `/server` - Server Resources\n"
-        f"• `/logs` - Log File"
+        f"• /server - Server Resources\n"
+        f"• /logs - Log File\n"
+        f"• /addadmin [ID] - Add Admin\n"
+        f"• /deladmin [ID] - Remove Admin"
     )
 
     await m.reply_text(msg, quote=True)
+
+async def add_admin_handler(c: Client, m: Message):
+    if m.from_user.id not in ADMIN_IDS:
+        return
+
+    if len(m.command) < 2:
+        await m.reply_text("⚠️ Usage: `/addadmin <user_id>`", quote=True)
+        return
+
+    try:
+        target_id = int(m.command[1])
+        await add_sudo(target_id)
+        await m.reply_text(f"✅ User `{target_id}` promoted to Admin.", quote=True)
+    except ValueError:
+        await m.reply_text("⚠️ Invalid ID.", quote=True)
+
+async def del_admin_handler(c: Client, m: Message):
+    if m.from_user.id not in ADMIN_IDS:
+        return
+
+    if len(m.command) < 2:
+        await m.reply_text("⚠️ Usage: `/deladmin <user_id>`", quote=True)
+        return
+
+    try:
+        target_id = int(m.command[1])
+        await del_sudo(target_id)
+        await m.reply_text(f"🗑️ User `{target_id}` removed from Admins.", quote=True)
+    except ValueError:
+        await m.reply_text("⚠️ Invalid ID.", quote=True)
