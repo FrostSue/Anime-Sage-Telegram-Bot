@@ -15,34 +15,38 @@ STRATEGIES = [
 async def generate_anime_recommendation(user_input: str, mood: str, genres: str, lang: str) -> str:
     """
     Kullanıcı girdisini alır, rastgele bir strateji seçer ve AI'dan buna göre öneri ister.
+    Dil zorlaması içerir.
     """
     try:
         async with AsyncGroq(api_key=GROQ_API_KEY) as client:
             
             current_strategy = random.choice(STRATEGIES)
 
+            lang_name = "Turkish" if lang == "tr" else "English"
+            
             system_instruction = (
-                f"You are Anime Sage. Language: {lang}. "
-                f"Task: Recommend ONE anime. "
-                f"Current Strategy: {current_strategy} "
-                f"IMPORTANT: Do not always recommend the most obvious/popular ones like Naruto or One Piece unless specifically asked. "
-                f"Format exactly:\n"
+                f"You are Anime Sage. "
+                f"CRITICAL RULE: You MUST write the entire response in {lang_name} language ONLY.\n"
+                f"Task: Recommend ONE anime.\n"
+                f"Strategy: {current_strategy}\n"
+                f"Constraint: Do not always recommend Naruto/One Piece.\n\n"
+                f"Format exactly like this (Translate headers to {lang_name}):\n"
                 f"🎬 **Title** (Year)\n"
                 f"⭐ Score: X/10\n"
                 f"🎭 Genre: A, B\n"
-                f"📝 **Overview:** A engaging description (2-3 sentences) explaining the hook."
+                f"📝 **Overview:** Write a engaging description (2-3 sentences) in {lang_name} explaining the hook."
             )
 
             context_parts = []
             if user_input: 
                 context_parts.append(f"User Request: {user_input}")
-                system_instruction += " (Prioritize User Request over Strategy)"
+                system_instruction += " (Prioritize User Request)"
             
             if genres: context_parts.append(f"User Likes: {genres}")
             if mood: context_parts.append(f"User Mood: {mood}")
             
             if not context_parts: 
-                context_parts.append("Surprise the user with something good.")
+                context_parts.append("Surprise the user.")
 
             final_user_content = ". ".join(context_parts)
 
@@ -53,7 +57,7 @@ async def generate_anime_recommendation(user_input: str, mood: str, genres: str,
                 ],
                 model=GROQ_MODEL,
                 temperature=0.85,
-                max_tokens=300,
+                max_tokens=350,
             )
 
             return completion.choices[0].message.content.strip()
@@ -62,9 +66,11 @@ async def generate_anime_recommendation(user_input: str, mood: str, genres: str,
         error_msg = str(e)
         logging.error(f"Groq API Error: {error_msg}")
         
-        if "404" in error_msg or "decommissioned" in error_msg:
-            return "⚠️ Model şu an güncelleniyor, lütfen geliştiriciye bildirin."
-        elif "429" in error_msg:
-            return "⚠️ Çok fazla istek var, biraz bekleyin."
-            
-        return "⚠️ Bağlantı hatası oluştu."
+        if lang == "tr":
+            if "404" in error_msg: return "⚠️ Model şu an bakımda."
+            if "429" in error_msg: return "⚠️ Çok fazla istek var, lütfen bekleyin."
+            return "⚠️ Bağlantı hatası oluştu."
+        else:
+            if "404" in error_msg: return "⚠️ Model is under maintenance."
+            if "429" in error_msg: return "⚠️ Too many requests, please wait."
+            return "⚠️ Connection error occurred."
