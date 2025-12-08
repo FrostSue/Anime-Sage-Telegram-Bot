@@ -17,6 +17,11 @@ async def init_db():
                 stats INTEGER DEFAULT 0
             )
         """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS sudoers (
+                user_id INTEGER PRIMARY KEY
+            )
+        """)
         await db.commit()
 
 async def register_user(user_id: int):
@@ -64,3 +69,19 @@ async def get_global_stats():
             if row:
                 return row[0], (row[1] if row[1] is not None else 0)
             return 0, 0
+
+async def add_sudo(user_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("INSERT OR IGNORE INTO sudoers (user_id) VALUES (?)", (user_id,))
+        await db.commit()
+
+async def del_sudo(user_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("DELETE FROM sudoers WHERE user_id = ?", (user_id,))
+        await db.commit()
+
+async def get_sudoers():
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT user_id FROM sudoers") as cursor:
+            rows = await cursor.fetchall()
+            return [row[0] for row in rows]
