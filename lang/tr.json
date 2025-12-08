@@ -1,13 +1,15 @@
 {
     "welcome": "Merhaba {name}! Anime Sage'e hoş geldiniz. Ben AI destekli anime rehberinizim.",
-    "help_text": "📜 **Komut Listesi**:\n/recommend [istek] - Yapay zekadan anime önerisi al (Örn: /recommend Naruto gibi)\n/setgenres [türler] - Sevdiğin türleri kaydet\n/setmood [mood] - Ruh halini kaydet\n/resetprefs - Ayarları sıfırla\n/stats - İstatistikler\n/adminpanel - Yönetici Paneli",
+    "help_text": "📜 **Komut Listesi**:\n/recommend [istek] - Anime önerisi al\n/setgenres [türler] - Sevdiğin türleri kaydet\n/setmood [mood] - Ruh halini kaydet\n/resetprefs - Ayarları sıfırla\n/stats - İstatistikler",
     "genres_set": "✅ Favori türleriniz hafızaya alındı: {genres}",
     "mood_set": "✅ Ruh haliniz hafızaya alındı: {mood}",
     "reset_done": "🔄 Tercihleriniz sıfırlandı.",
-    "stats_msg": "📊 **Grup İstatistikleri**:\n👥 Kullanıcı: {users}\n🔄 Toplam Öneri: {total}",
-    "lang_changed": "🇹🇷 Dil Türkçe olarak ayarlandı.",
+    "stats_msg": "📊 **İstatistikleriniz**\n\n🔍 Şimdiye kadar aldığınız toplam öneri: **{total}**",
     "admin_only": "❌ Bu komutu sadece yöneticiler kullanabilir.",
-    "select_lang": "Lütfen bir dil seçin / Please select a language:",
-    "admin_panel_title": "🔧 **Yönetici Paneli**\nBuradan grup ayarlarını yönetebilirsiniz.",
-    "thinking": "🧠 **Anime Sage düşünüyor...**"
+    "thinking": "🧠 **Anime Sage düşünüyor...**",
+    "missing_genres": "⚠️ Lütfen türleri belirtin.\nÖrnek: `/setgenres Aksiyon, Komedi`",
+    "missing_mood": "⚠️ Lütfen modunuzu belirtin.\nÖrnek: `/setmood Mutlu, Heyecanlı`",
+    "not_registered": "⚠️ **Kayıt Bulunamadı!**\nLütfen dil seçimi yapmak için botu özelden başlatın:\n👉 [Tıkla ve Başlat]({link})",
+    "set_lang_first": "⚠️ Lütfen önce özelden dil seçimi yapın.",
+    "lang_selected": "🇹🇷 Dil Türkçe olarak ayarlandı! Artık kullanabilirsiniz."
 }
