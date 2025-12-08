@@ -6,15 +6,14 @@ async def init_db():
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("""
             CREATE TABLE IF NOT EXISTS groups (
-                group_id INTEGER PRIMARY KEY,
-                language TEXT DEFAULT 'en',
-                settings TEXT DEFAULT '{}'
+                group_id INTEGER PRIMARY KEY
             )
         """)
+        
         await db.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 user_id INTEGER PRIMARY KEY,
-                group_id INTEGER,
+                language TEXT DEFAULT NULL,
                 genres TEXT DEFAULT '',
                 mood TEXT DEFAULT '',
                 stats INTEGER DEFAULT 0
@@ -22,23 +21,36 @@ async def init_db():
         """)
         await db.commit()
 
-async def get_group_lang(group_id: int) -> str:
-    async with aiosqlite.connect(DB_PATH) as db:
-        async with db.execute("SELECT language FROM groups WHERE group_id = ?", (group_id,)) as cursor:
-            row = await cursor.fetchone()
-            return row[0] if row else "en"
 
-async def set_group_lang(group_id: int, lang: str):
+async def register_user(user_id: int):
+    """Kullanıcıyı veritabanına ekler (Varsa atlar)."""
     async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute("INSERT OR REPLACE INTO groups (group_id, language) VALUES (?, ?)", (group_id, lang))
+        await db.execute("INSERT OR IGNORE INTO users (user_id) VALUES (?)", (user_id,))
         await db.commit()
 
-async def update_user_pref(user_id: int, group_id: int, key: str, value: str):
+async def is_user_registered(user_id: int) -> bool:
+    """Kullanıcı kayıtlı mı kontrol eder."""
     async with aiosqlite.connect(DB_PATH) as db:
-        exists = await db.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,))
-        if not await exists.fetchone():
-            await db.execute("INSERT INTO users (user_id, group_id) VALUES (?, ?)", (user_id, group_id))
-        
+        async with db.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,)) as cursor:
+            return await cursor.fetchone() is not None
+
+async def get_user_lang(user_id: int) -> str:
+    """Kullanıcının dilini döndürür. Ayarlı değilse None döner."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT language FROM users WHERE user_id = ?", (user_id,)) as cursor:
+            row = await cursor.fetchone()
+            return row[0] if row and row[0] else None
+
+async def set_user_lang(user_id: int, lang: str):
+    """Kullanıcının dilini günceller."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("INSERT OR IGNORE INTO users (user_id) VALUES (?)", (user_id,))
+        await db.execute("UPDATE users SET language = ? WHERE user_id = ?", (lang, user_id))
+        await db.commit()
+
+
+async def update_user_pref(user_id: int, key: str, value: str):
+    async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(f"UPDATE users SET {key} = ? WHERE user_id = ?", (value, user_id))
         await db.commit()
 
@@ -48,13 +60,21 @@ async def get_user_data(user_id: int):
         async with db.execute("SELECT * FROM users WHERE user_id = ?", (user_id,)) as cursor:
             return await cursor.fetchone()
 
-async def increment_stats(user_id: int, group_id: int):
+async def increment_stats(user_id: int):
     async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute("INSERT OR IGNORE INTO users (user_id, group_id, stats) VALUES (?, ?, 0)", (user_id, group_id))
         await db.execute("UPDATE users SET stats = stats + 1 WHERE user_id = ?", (user_id,))
         await db.commit()
 
-async def get_group_stats(group_id: int):
+async def get_global_stats():
+    """
+    Admin paneli için global istatistikleri çeker.
+    Dönüş: (toplam_kullanıcı, toplam_öneri_sayısı)
+    """
     async with aiosqlite.connect(DB_PATH) as db:
-        async with db.execute("SELECT COUNT(*), SUM(stats) FROM users WHERE group_id = ?", (group_id,)) as cursor:
-            return await cursor.fetchone()
+        async with db.execute("SELECT COUNT(*), SUM(stats) FROM users") as cursor:
+            row = await cursor.fetchone()
+            if row:
+                total_users = row[0]
+                total_recs = row[1] if row[1] is not None else 0
+                return total_users, total_recs
+            return 0, 0
