@@ -12,7 +12,7 @@ from handlers.recommend import recommend_handler
 from handlers.preferences import mood_menu_handler, genre_menu_handler, show_profile, reset_prefs, pref_callback_handler
 from handlers.help import help_handler
 from handlers.stats import stats_handler
-from handlers.admin import admin_panel, server_info, log_file_handler, add_admin_handler, del_admin_handler
+from handlers.admin import admin_panel, server_info, log_file_handler, add_admin_handler, del_admin_handler, speedtest_handler
 
 logging.basicConfig(
     level=logging.INFO, 
@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 API_ID = int(os.getenv("API_ID"))
-API_HASH = os.getenv("API_HASH")
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+API_HASH = os.getenv("API_HASH", "")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip()]
 
 async def main():
@@ -39,22 +39,19 @@ async def main():
     app.add_handler(MessageHandler(start_handler, filters.command("start")))
     app.add_handler(MessageHandler(language_command_handler, filters.command("language")))
     app.add_handler(CallbackQueryHandler(lang_callback_handler, filters.regex(r"^setlang_")))
-    
     app.add_handler(MessageHandler(recommend_handler, filters.command("recommend")))
-    
     app.add_handler(MessageHandler(genre_menu_handler, filters.command(["genre", "setgenres"])))
     app.add_handler(MessageHandler(mood_menu_handler, filters.command(["mood", "setmood"])))
     app.add_handler(MessageHandler(show_profile, filters.command(["settings", "profile"])))
     app.add_handler(MessageHandler(reset_prefs, filters.command("resetprefs")))
-    
     app.add_handler(CallbackQueryHandler(pref_callback_handler, filters.regex(r"^(set_|cancel_)")))
-
     app.add_handler(MessageHandler(help_handler, filters.command("help")))
     app.add_handler(MessageHandler(stats_handler, filters.command("stats")))
     
     app.add_handler(MessageHandler(admin_panel, filters.command("adminpanel")))
     app.add_handler(MessageHandler(server_info, filters.command("server")))
     app.add_handler(MessageHandler(log_file_handler, filters.command("logs")))
+    app.add_handler(MessageHandler(speedtest_handler, filters.command("speedtest")))
     app.add_handler(MessageHandler(add_admin_handler, filters.command(["addadmin", "addsudo"])))
     app.add_handler(MessageHandler(del_admin_handler, filters.command(["deladmin", "delsudo"])))
 
