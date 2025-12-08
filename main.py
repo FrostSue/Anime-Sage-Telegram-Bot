@@ -12,10 +12,10 @@ from handlers.recommend import recommend_handler
 from handlers.preferences import mood_menu_handler, genre_menu_handler, show_profile, reset_prefs, pref_callback_handler
 from handlers.help import help_handler
 from handlers.stats import stats_handler
-from handlers.admin import admin_panel, server_info, log_file_handler
+from handlers.admin import admin_panel, server_info, log_file_handler, add_admin_handler, del_admin_handler
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.INFO, 
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.FileHandler("anime_sage.log"),
@@ -55,6 +55,8 @@ async def main():
     app.add_handler(MessageHandler(admin_panel, filters.command("adminpanel")))
     app.add_handler(MessageHandler(server_info, filters.command("server")))
     app.add_handler(MessageHandler(log_file_handler, filters.command("logs")))
+    app.add_handler(MessageHandler(add_admin_handler, filters.command(["addadmin", "addsudo"])))
+    app.add_handler(MessageHandler(del_admin_handler, filters.command(["deladmin", "delsudo"])))
 
     async with app:
         await set_bot_commands(app)
