@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from pyrogram import Client, filters, idle
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-
+from handlers.preferences import set_genres, set_mood, reset_prefs, pref_callback_handler
 from database.db import init_db
 from utils.languages import load_languages
 from utils.menu import set_bot_commands
@@ -51,7 +51,7 @@ async def main():
     app.add_handler(CallbackQueryHandler(lang_callback_handler, filters.regex(r"^setlang_")))
 
     app.add_handler(MessageHandler(recommend_handler, filters.command("recommend")))
-    
+    app.add_handler(CallbackQueryHandler(pref_callback_handler, filters.regex(r"^(set_|cancel_)")))
     app.add_handler(MessageHandler(set_genres, filters.command("setgenres")))
     app.add_handler(MessageHandler(set_mood, filters.command("setmood")))
     app.add_handler(MessageHandler(reset_prefs, filters.command("resetprefs")))
