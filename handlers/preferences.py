@@ -11,13 +11,27 @@ async def show_profile(c: Client, m: Message):
     user_id = m.from_user.id
     user_data = await get_user_data(user_id)
     
-    mood = user_data["mood"] if user_data and user_data["mood"] else "❌"
-    genres = user_data["genres"] if user_data and user_data["genres"] else "❌"
+    raw_mood = user_data["mood"] if user_data and user_data["mood"] else None
+    raw_genre = user_data["genres"] if user_data and user_data["genres"] else None
+    
+    if raw_mood:
+        mood_key = f"mood_{raw_mood.lower()}"
+        display_mood = t(mood_key, lang)
+        if display_mood == mood_key: display_mood = raw_mood 
+    else:
+        display_mood = "❌"
+
+    if raw_genre:
+        genre_key = f"genre_{raw_genre.lower()}"
+        display_genre = t(genre_key, lang)
+        if display_genre == genre_key: display_genre = raw_genre
+    else:
+        display_genre = "❌"
     
     msg = t("profile_msg", lang, 
             name=m.from_user.first_name, 
-            mood=mood, 
-            genre=genres)
+            mood=display_mood, 
+            genre=display_genre)
             
     await m.reply_text(msg, quote=True)
 
@@ -33,12 +47,19 @@ async def mood_menu_handler(c: Client, m: Message):
             InlineKeyboardButton(t("mood_sad", lang), callback_data=f"set_mood|Sad|{user_id}")
         ],
         [
-            InlineKeyboardButton(t("mood_exciting", lang), callback_data=f"set_mood|Exciting|{user_id}"),
-            InlineKeyboardButton(t("mood_relaxing", lang), callback_data=f"set_mood|Relaxing|{user_id}")
+            InlineKeyboardButton(t("mood_excited", lang), callback_data=f"set_mood|Excited|{user_id}"),
+            InlineKeyboardButton(t("mood_tired", lang), callback_data=f"set_mood|Tired|{user_id}")
         ],
         [
-            InlineKeyboardButton(t("mood_dark", lang), callback_data=f"set_mood|Dark|{user_id}"),
-            InlineKeyboardButton(t("mood_romantic", lang), callback_data=f"set_mood|Romantic|{user_id}")
+            InlineKeyboardButton(t("mood_curious", lang), callback_data=f"set_mood|Curious|{user_id}"),
+            InlineKeyboardButton(t("mood_bored", lang), callback_data=f"set_mood|Bored|{user_id}")
+        ],
+        [
+            InlineKeyboardButton(t("mood_romantic", lang), callback_data=f"set_mood|Romantic|{user_id}"),
+            InlineKeyboardButton(t("mood_dark", lang), callback_data=f"set_mood|Dark|{user_id}")
+        ],
+        [
+            InlineKeyboardButton(t("btn_cancel", lang), callback_data=f"cancel_pref|x|{user_id}")
         ]
     ]
     
@@ -52,19 +73,27 @@ async def genre_menu_handler(c: Client, m: Message):
     
     buttons = [
         [
-            InlineKeyboardButton(t("genre_shonen", lang), callback_data=f"set_genre|Shonen|{user_id}"),
-            InlineKeyboardButton(t("genre_seinen", lang), callback_data=f"set_genre|Seinen|{user_id}")
+            InlineKeyboardButton(t("genre_action", lang), callback_data=f"set_genre|Action|{user_id}"),
+            InlineKeyboardButton(t("genre_drama", lang), callback_data=f"set_genre|Drama|{user_id}")
         ],
         [
-            InlineKeyboardButton(t("genre_isekai", lang), callback_data=f"set_genre|Isekai|{user_id}"),
-            InlineKeyboardButton(t("genre_sliceoflife", lang), callback_data=f"set_genre|SliceOfLife|{user_id}")
+            InlineKeyboardButton(t("genre_comedy", lang), callback_data=f"set_genre|Comedy|{user_id}"),
+            InlineKeyboardButton(t("genre_fantasy", lang), callback_data=f"set_genre|Fantasy|{user_id}")
+        ],
+        [
+            InlineKeyboardButton(t("genre_horror", lang), callback_data=f"set_genre|Horror|{user_id}"),
+            InlineKeyboardButton(t("genre_mystery", lang), callback_data=f"set_genre|Mystery|{user_id}")
         ],
         [
             InlineKeyboardButton(t("genre_romance", lang), callback_data=f"set_genre|Romance|{user_id}"),
             InlineKeyboardButton(t("genre_scifi", lang), callback_data=f"set_genre|SciFi|{user_id}")
         ],
         [
-             InlineKeyboardButton(t("genre_horror", lang), callback_data=f"set_genre|Horror|{user_id}")
+            InlineKeyboardButton(t("genre_sliceoflife", lang), callback_data=f"set_genre|SliceOfLife|{user_id}"),
+            InlineKeyboardButton(t("genre_sports", lang), callback_data=f"set_genre|Sports|{user_id}")
+        ],
+        [
+            InlineKeyboardButton(t("btn_cancel", lang), callback_data=f"cancel_pref|x|{user_id}")
         ]
     ]
     
@@ -75,22 +104,18 @@ async def reset_prefs(c: Client, m: Message):
     if not is_valid: return
 
     user_id = m.from_user.id
-    
     await update_user_pref(user_id, "genres", "")
     await update_user_pref(user_id, "mood", "")
-    
     await m.reply_text(t("reset_done", lang))
 
 async def pref_callback_handler(c: Client, q: CallbackQuery):
     data = q.data
-    
     parts = data.split("|")
     action_type = parts[0]
     value = parts[1]
     owner_id = int(parts[2])
 
     clicker_id = q.from_user.id
-    
     user_data = await get_user_data(clicker_id)
     lang = user_data["language"] if user_data and user_data["language"] else "en"
 
@@ -98,13 +123,19 @@ async def pref_callback_handler(c: Client, q: CallbackQuery):
         await q.answer(t("err_not_your_menu", lang), show_alert=True)
         return
 
+    if action_type == "cancel_pref":
+        await q.message.delete()
+        return
+
     if action_type == "set_mood":
         await update_user_pref(owner_id, "mood", value)
-        final_msg = t("msg_mood_updated", lang, mood=value)
+        display_text = t(f"mood_{value.lower()}", lang)
+        final_msg = t("msg_mood_updated", lang, mood=display_text)
         
     elif action_type == "set_genre":
         await update_user_pref(owner_id, "genres", value)
-        final_msg = t("msg_genre_updated", lang, genre=value)
+        display_text = t(f"genre_{value.lower()}", lang)
+        final_msg = t("msg_genre_updated", lang, genre=display_text)
 
     await q.answer("Kaydedildi / Saved")
     await q.edit_message_text(final_msg)
