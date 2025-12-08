@@ -1,0 +1,28 @@
+from pyrogram import Client
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from database.db import is_user_registered, get_user_lang
+from utils.languages import t
+
+async def check_user_registration(c: Client, m: Message) -> tuple[bool, str]:
+    user_id = m.from_user.id
+    
+    if not await is_user_registered(user_id):
+        bot_username = (await c.get_me()).username
+        deep_link = f"https://t.me/{bot_username}?start=register"
+        
+        
+        msg_text = t("not_registered", "en", link=deep_link)
+        
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🚀 Start / Başlat", url=deep_link)]
+        ])
+        
+        await m.reply_text(msg_text, reply_markup=kb, quote=True, disable_web_page_preview=True)
+        return False, "en"
+
+    lang = await get_user_lang(user_id)
+    if not lang:
+        await m.reply_text("⚠️ Please set your language first via /language.")
+        return False, "en"
+        
+    return True, lang
