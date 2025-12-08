@@ -1,6 +1,7 @@
 {
     "welcome": "Merhaba {name}! Anime Sage'e hoş geldiniz. Ben AI destekli anime rehberinizim.",
     "help_text": "📜 **Komut Listesi**:\n\n🤖 **Ana Komutlar**\n/recommend [istek] - Anime önerisi al\n/mood - Ruh halini seç\n/genre - Sevdiğin türü seç\n\n⚙️ **Ayarlar**\n/settings - Profilini ve ayarlarını gör\n/resetprefs - Tüm tercihleri sıfırla\n\n📊 **Diğer**\n/stats - İstatistikler\n/help - Bu menüyü gösterir",
+    "help_text_admin": "📜 **YÖNETİCİ Komut Listesi**:\n\n🤖 **Kullanıcı Komutları**\n/recommend [istek] - Öneri al\n/mood, /genre, /settings - Ayarlar\n\n🔒 **Yönetici Paneli**\n/adminpanel - Genel durum\n/server - Sunucu kaynakları\n/logs - Sistem logları\n\n👑 **Yetki Yönetimi**\n/addadmin [ID] - Admin ekle\n/deladmin [ID] - Admin sil",
     "reset_done": "🔄 Tercihleriniz sıfırlandı.",
     "stats_msg": "📊 **İstatistikleriniz**\n\n🔍 Şimdiye kadar aldığınız toplam öneri: **{total}**",
     "admin_only": "❌ Bu komutu sadece yöneticiler kullanabilir.",
