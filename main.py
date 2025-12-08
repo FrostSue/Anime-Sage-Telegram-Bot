@@ -45,7 +45,7 @@ async def main():
     app.add_handler(MessageHandler(show_profile, filters.command(["settings", "profile"])))
     app.add_handler(MessageHandler(reset_prefs, filters.command("resetprefs")))
     
-    app.add_handler(CallbackQueryHandler(pref_callback_handler, filters.regex(r"^set_(mood|genre)\|")))
+    app.add_handler(CallbackQueryHandler(pref_callback_handler, filters.regex(r"^(set_|cancel_)")))
 
     app.add_handler(MessageHandler(help_handler, filters.command("help")))
     app.add_handler(MessageHandler(stats_handler, filters.command("stats")))
