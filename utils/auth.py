@@ -1,7 +1,8 @@
 from pyrogram import Client
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from database.db import is_user_registered, get_user_lang
+from database.db import is_user_registered, get_user_lang, get_sudoers
 from utils.languages import t
+from app.config import ADMIN_IDS
 
 async def check_user_registration(c: Client, m: Message) -> tuple[bool, str]:
     user_id = m.from_user.id
@@ -9,7 +10,6 @@ async def check_user_registration(c: Client, m: Message) -> tuple[bool, str]:
     if not await is_user_registered(user_id):
         bot_username = (await c.get_me()).username
         deep_link = f"https://t.me/{bot_username}?start=register"
-        
         
         msg_text = t("not_registered", "en", link=deep_link)
         
@@ -26,3 +26,13 @@ async def check_user_registration(c: Client, m: Message) -> tuple[bool, str]:
         return False, "en"
         
     return True, lang
+
+async def is_admin(user_id: int) -> bool:
+    if user_id in ADMIN_IDS:
+        return True
+    
+    sudo_list = await get_sudoers()
+    if user_id in sudo_list:
+        return True
+        
+    return False
