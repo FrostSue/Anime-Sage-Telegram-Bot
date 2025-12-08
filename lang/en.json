@@ -11,5 +11,31 @@
     "missing_mood": "⚠️ Please specify mood.\nExample: `/setmood Happy, Excited`",
     "not_registered": "⚠️ **Not Registered!**\nPlease start the bot privately to set your language:\n👉 [Click to Start]({link})",
     "set_lang_first": "⚠️ Please set your language privately first.",
-    "lang_selected": "🇬🇧 Language set to English! You can now use the bot."
+    "lang_selected": "🇬🇧 Language set to English! You can now use the bot.",
+    "select_genre": "🎬 **Please select your favorite genre:**\n(Selection will overwrite current preferences)",
+    "select_mood": "🎭 **How is your current mood?**\n(Selection will overwrite current preferences)",
+    "pref_updated": "✅ Preferences updated: **{value}**",
+    "btn_cancel": "❌ Cancel",
+
+    "genre_action": "Action",
+    "genre_adventure": "Adventure",
+    "genre_comedy": "Comedy",
+    "genre_drama": "Drama",
+    "genre_fantasy": "Fantasy",
+    "genre_horror": "Horror",
+    "genre_mystery": "Mystery",
+    "genre_romance": "Romance",
+    "genre_scifi": "Sci-Fi",
+    "genre_sliceoflife": "Slice of Life",
+    "genre_sports": "Sports",
+    "genre_supernatural": "Supernatural",
+
+    "mood_happy": "Happy 😊",
+    "mood_sad": "Sad 😢",
+    "mood_excited": "Excited 🤩",
+    "mood_relaxed": "Relaxed 😌",
+    "mood_dark": "Dark 💀",
+    "mood_romantic": "Romantic 🥰",
+    "mood_bored": "Bored 😐",
+    "mood_curious": "Curious 🧐"
 }

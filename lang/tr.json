@@ -11,5 +11,31 @@
     "missing_mood": "⚠️ Lütfen modunuzu belirtin.\nÖrnek: `/setmood Mutlu, Heyecanlı`",
     "not_registered": "⚠️ **Kayıt Bulunamadı!**\nLütfen dil seçimi yapmak için botu özelden başlatın:\n👉 [Tıkla ve Başlat]({link})",
     "set_lang_first": "⚠️ Lütfen önce özelden dil seçimi yapın.",
-    "lang_selected": "🇹🇷 Dil Türkçe olarak ayarlandı! Artık kullanabilirsiniz."
+    "lang_selected": "🇹🇷 Dil Türkçe olarak ayarlandı! Artık kullanabilirsiniz.",
+    "select_genre": "🎬 **Lütfen favori türünüzü seçin:**\n(Seçiminiz mevcut tercihlerinizin üzerine yazılacaktır)",
+    "select_mood": "🎭 **Şu anki ruh haliniz nasıl?**\n(Seçiminiz mevcut tercihlerinizin üzerine yazılacaktır)",
+    "pref_updated": "✅ Tercihleriniz güncellendi: **{value}**",
+    "btn_cancel": "❌ İptal",
+    
+    "genre_action": "Aksiyon",
+    "genre_adventure": "Macera",
+    "genre_comedy": "Komedi",
+    "genre_drama": "Dram",
+    "genre_fantasy": "Fantastik",
+    "genre_horror": "Korku",
+    "genre_mystery": "Gizem",
+    "genre_romance": "Romantik",
+    "genre_scifi": "Bilim Kurgu",
+    "genre_sliceoflife": "Günlük Yaşam",
+    "genre_sports": "Spor",
+    "genre_supernatural": "Doğaüstü",
+
+    "mood_happy": "Mutlu 😊",
+    "mood_sad": "Hüzünlü 😢",
+    "mood_excited": "Heyecanlı 🤩",
+    "mood_relaxed": "Rahat 😌",
+    "mood_dark": "Karanlık 💀",
+    "mood_romantic": "Romantik 🥰",
+    "mood_bored": "Sıkılmış 😐",
+    "mood_curious": "Meraklı 🧐"
 }
