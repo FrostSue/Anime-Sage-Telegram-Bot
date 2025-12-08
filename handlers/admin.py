@@ -4,11 +4,13 @@ import time
 import psutil
 import platform
 import subprocess
+import speedtest
 from pyrogram import Client
 from pyrogram.types import Message
 from app.config import ADMIN_IDS
 from database.db import get_global_stats, add_sudo, del_sudo
 from utils.auth import is_admin
+
 
 def get_readable_time(seconds: int) -> str:
     count = 0
@@ -30,6 +32,7 @@ def get_readable_time(seconds: int) -> str:
     ping_time += ":".join(time_list)
     return ping_time
 
+
 def get_cpu_model():
     try:
         command = "cat /proc/cpuinfo | grep 'model name' | head -1 | cut -d: -f2"
@@ -38,6 +41,7 @@ def get_cpu_model():
     except:
         return platform.processor()
 
+
 def get_distro_name():
     try:
         command = "cat /etc/os-release | grep PRETTY_NAME | cut -d= -f2 | tr -d '\"'"
@@ -45,6 +49,7 @@ def get_distro_name():
         return distro
     except:
         return f"{platform.system()} {platform.release()}"
+
 
 def get_package_count():
     try:
@@ -60,6 +65,7 @@ def get_package_count():
         return f"{count} ({mgr})"
     except:
         return "N/A"
+
 
 async def server_info(c: Client, m: Message):
     if not await is_admin(m.from_user.id):
@@ -117,8 +123,8 @@ Swap:     {swap_used} / {swap_total} ({swap_percent}%)
 Disk (/): {disk_used} / {disk_total} ({disk_percent}%)
 
 Local IP: Hidden
-```
-"""
+```"""
+
     await m.reply_text(msg, quote=True)
 
 
@@ -127,7 +133,6 @@ async def log_file_handler(c: Client, m: Message):
         return
 
     log_file = "anime_sage.log"
-
     if not os.path.exists(log_file):
         await m.reply_text("⚠️ Log file not found.", quote=True)
         return
@@ -144,7 +149,6 @@ async def log_file_handler(c: Client, m: Message):
             document=log_file,
             caption=f"📜 **System Logs**\n\n**Last Lines:**\n```\n{last_lines}```"
         )
-
     except Exception as e:
         await m.reply_text(f"Error reading logs: {str(e)}", quote=True)
 
@@ -164,6 +168,7 @@ async def admin_panel(c: Client, m: Message):
         f"📡 Status: Online ✅\n\n"
         f"Commands:\n"
         f"• /server - Server Resources\n"
+        f"• /speedtest - Network Speed\n"
         f"• /logs - Log File\n"
         f"• /addadmin [ID] - Add Admin\n"
         f"• /deladmin [ID] - Remove Admin"
@@ -202,3 +207,25 @@ async def del_admin_handler(c: Client, m: Message):
         await m.reply_text(f"🗑️ User {target_id} removed from Admins.", quote=True)
     except ValueError:
         await m.reply_text("⚠️ Invalid ID.", quote=True)
+
+
+def run_speedtest():
+    s = speedtest.Speedtest()
+    s.get_best_server()
+    s.download()
+    s.upload()
+    return s.results.share()
+
+
+async def speedtest_handler(c: Client, m: Message):
+    if not await is_admin(m.from_user.id):
+        return
+
+    status_msg = await m.reply_text("🚀 **Speedtest running...** (This may take 30s)", quote=True)
+
+    try:
+        img_url = await c.loop.run_in_executor(None, run_speedtest)
+        await m.reply_photo(photo=img_url, caption="✅ **Speedtest Completed!**")
+        await status_msg.delete()
+    except Exception as e:
+        await status_msg.edit_text(f"⚠️ Speedtest failed: {str(e)}")
