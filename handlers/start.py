@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from database.db import register_user, get_user_lang, set_user_lang
 from utils.languages import t
@@ -17,7 +17,7 @@ async def start_handler(c: Client, m: Message):
     
     lang = await get_user_lang(user_id)
     
-    if m.chat.type == list(filters.private)[0].value:
+    if m.chat.type == enums.ChatType.PRIVATE:
         if not lang:
             await m.reply_text(
                 "👋 **Welcome / Hoş Geldiniz!**\n\n"
@@ -36,7 +36,7 @@ async def start_handler(c: Client, m: Message):
             await m.reply_text(t("welcome", lang, name=m.from_user.first_name))
 
 async def lang_callback_handler(c: Client, q: CallbackQuery):
-    lang_code = q.data.split("_")[1]
+    lang_code = q.data.split("_")[1] 
     
     await set_user_lang(q.from_user.id, lang_code)
     
