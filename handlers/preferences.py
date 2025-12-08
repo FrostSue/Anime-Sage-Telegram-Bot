@@ -55,8 +55,11 @@ async def mood_menu_handler(c: Client, m: Message):
             InlineKeyboardButton(t("mood_bored", lang), callback_data=f"set_mood|Bored|{user_id}")
         ],
         [
-            InlineKeyboardButton(t("mood_romantic", lang), callback_data=f"set_mood|Romantic|{user_id}"),
+            InlineKeyboardButton(t("mood_relaxing", lang), callback_data=f"set_mood|Relaxing|{user_id}"),
             InlineKeyboardButton(t("mood_dark", lang), callback_data=f"set_mood|Dark|{user_id}")
+        ],
+        [
+            InlineKeyboardButton(t("mood_romantic", lang), callback_data=f"set_mood|Romantic|{user_id}")
         ],
         [
             InlineKeyboardButton(t("btn_cancel", lang), callback_data=f"cancel_pref|x|{user_id}")
@@ -91,6 +94,13 @@ async def genre_menu_handler(c: Client, m: Message):
         [
             InlineKeyboardButton(t("genre_sliceoflife", lang), callback_data=f"set_genre|SliceOfLife|{user_id}"),
             InlineKeyboardButton(t("genre_sports", lang), callback_data=f"set_genre|Sports|{user_id}")
+        ],
+        [
+            InlineKeyboardButton(t("genre_shonen", lang), callback_data=f"set_genre|Shonen|{user_id}"),
+            InlineKeyboardButton(t("genre_seinen", lang), callback_data=f"set_genre|Seinen|{user_id}")
+        ],
+        [
+            InlineKeyboardButton(t("genre_isekai", lang), callback_data=f"set_genre|Isekai|{user_id}")
         ],
         [
             InlineKeyboardButton(t("btn_cancel", lang), callback_data=f"cancel_pref|x|{user_id}")
