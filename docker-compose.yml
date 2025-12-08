@@ -1,0 +1,10 @@
+services:
+  anime-sage:
+    build: .
+    container_name: anime_sage_bot
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./anime_sage.db:/app/anime_sage.db
+      - ./anime_sage_session.session:/app/anime_sage_session.session
