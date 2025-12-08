@@ -3,6 +3,7 @@ import sys
 import time
 import psutil
 import platform
+import subprocess
 from pyrogram import Client
 from pyrogram.types import Message
 from app.config import ADMIN_IDS
@@ -29,24 +30,54 @@ def get_readable_time(seconds: int) -> str:
     ping_time += ":".join(time_list)
     return ping_time
 
+def get_cpu_model():
+    try:
+        command = "cat /proc/cpuinfo | grep 'model name' | head -1 | cut -d: -f2"
+        model = subprocess.check_output(command, shell=True).decode().strip()
+        return model
+    except:
+        return platform.processor()
+
+def get_distro_name():
+    try:
+        command = "cat /etc/os-release | grep PRETTY_NAME | cut -d= -f2 | tr -d '\"'"
+        distro = subprocess.check_output(command, shell=True).decode().strip()
+        return distro
+    except:
+        return f"{platform.system()} {platform.release()}"
+
+def get_package_count():
+    try:
+        if os.path.exists("/usr/bin/dpkg"):
+            cmd = "dpkg -l | grep -c ^ii"
+            mgr = "dpkg"
+        elif os.path.exists("/usr/bin/rpm"):
+            cmd = "rpm -qa | wc -l"
+            mgr = "rpm"
+        else:
+            return "N/A"
+        count = subprocess.check_output(cmd, shell=True).decode().strip()
+        return f"{count} ({mgr})"
+    except:
+        return "N/A"
 
 async def server_info(c: Client, m: Message):
     if not await is_admin(m.from_user.id):
         return
 
     uname = platform.uname()
-    os_name = f"{uname.system} {uname.release}"
     host_name = uname.node
     kernel = uname.release
+    os_info = get_distro_name()
 
     boot_time_timestamp = psutil.boot_time()
     uptime_seconds = int(time.time() - boot_time_timestamp)
     uptime_str = get_readable_time(uptime_seconds)
 
+    cpu_model = get_cpu_model()
     cpu_freq = psutil.cpu_freq()
-    cpu_freq_str = f"{cpu_freq.current:.2f} Mhz" if cpu_freq else "N/A"
+    cpu_freq_str = f"{cpu_freq.current/1000:.2f} GHz" if cpu_freq else "N/A"
     cpu_count = psutil.cpu_count(logical=True)
-    cpu_percent = psutil.cpu_percent(interval=0.1)
 
     mem = psutil.virtual_memory()
     mem_total = f"{mem.total / (1024 ** 3):.2f} GiB"
@@ -63,21 +94,27 @@ async def server_info(c: Client, m: Message):
     swap_used = f"{swap.used / (1024 ** 3):.2f} GiB"
     swap_percent = swap.percent
 
-    py_ver = sys.version.split()[0]
+    shell = os.environ.get("SHELL", "N/A").split("/")[-1]
+    term = os.environ.get("TERM", "N/A")
+    locale = os.environ.get("LANG", "N/A")
+    packages = get_package_count()
 
     msg = f"""
 **🖥️ Server Status**
 ```text
-OS:      {os_name}
-Host:    {host_name}
-Kernel:  {kernel}
-Uptime:  {uptime_str}
-Python:  v{py_ver}
+OS:       {os_info}
+Host:     {host_name}
+Kernel:   {kernel}
+Uptime:   {uptime_str}
+Packages: {packages}
+Shell:    {shell}
+Terminal: {term}
+Locale:   {locale}
 
-CPU:     {uname.processor} ({cpu_count} Core) @ {cpu_percent}%
-Memory:  {mem_used} / {mem_total} ({mem_percent}%)
-Disk:    {disk_used} / {disk_total} ({disk_percent}%)
-Swap:    {swap_used} / {swap_total} ({swap_percent}%)
+CPU:      {cpu_model} ({cpu_count}) @ {cpu_freq_str}
+Memory:   {mem_used} / {mem_total} ({mem_percent}%)
+Swap:     {swap_used} / {swap_total} ({swap_percent}%)
+Disk (/): {disk_used} / {disk_total} ({disk_percent}%)
 
 Local IP: Hidden
 ```
