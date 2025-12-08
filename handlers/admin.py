@@ -4,13 +4,19 @@ import time
 import psutil
 import platform
 import subprocess
-import speedtest
+import logging
 from pyrogram import Client
 from pyrogram.types import Message
 from app.config import ADMIN_IDS
 from database.db import get_global_stats, add_sudo, del_sudo
 from utils.auth import is_admin
 
+try:
+    import speedtest
+    SPEEDTEST_AVAILABLE = True
+except ImportError:
+    SPEEDTEST_AVAILABLE = False
+    logging.warning("speedtest-cli modulü bulunamadi! /speedtest calismayacak.")
 
 def get_readable_time(seconds: int) -> str:
     count = 0
@@ -32,7 +38,6 @@ def get_readable_time(seconds: int) -> str:
     ping_time += ":".join(time_list)
     return ping_time
 
-
 def get_cpu_model():
     try:
         command = "cat /proc/cpuinfo | grep 'model name' | head -1 | cut -d: -f2"
@@ -41,7 +46,6 @@ def get_cpu_model():
     except:
         return platform.processor()
 
-
 def get_distro_name():
     try:
         command = "cat /etc/os-release | grep PRETTY_NAME | cut -d= -f2 | tr -d '\"'"
@@ -49,7 +53,6 @@ def get_distro_name():
         return distro
     except:
         return f"{platform.system()} {platform.release()}"
-
 
 def get_package_count():
     try:
@@ -66,7 +69,6 @@ def get_package_count():
     except:
         return "N/A"
 
-
 async def server_info(c: Client, m: Message):
     if not await is_admin(m.from_user.id):
         return
@@ -75,7 +77,7 @@ async def server_info(c: Client, m: Message):
     host_name = uname.node
     kernel = uname.release
     os_info = get_distro_name()
-
+    
     boot_time_timestamp = psutil.boot_time()
     uptime_seconds = int(time.time() - boot_time_timestamp)
     uptime_str = get_readable_time(uptime_seconds)
@@ -84,7 +86,7 @@ async def server_info(c: Client, m: Message):
     cpu_freq = psutil.cpu_freq()
     cpu_freq_str = f"{cpu_freq.current/1000:.2f} GHz" if cpu_freq else "N/A"
     cpu_count = psutil.cpu_count(logical=True)
-
+    
     mem = psutil.virtual_memory()
     mem_total = f"{mem.total / (1024 ** 3):.2f} GiB"
     mem_used = f"{mem.used / (1024 ** 3):.2f} GiB"
@@ -94,7 +96,7 @@ async def server_info(c: Client, m: Message):
     disk_total = f"{disk.total / (1024 ** 3):.2f} GiB"
     disk_used = f"{disk.used / (1024 ** 3):.2f} GiB"
     disk_percent = disk.percent
-
+    
     swap = psutil.swap_memory()
     swap_total = f"{swap.total / (1024 ** 3):.2f} GiB"
     swap_used = f"{swap.used / (1024 ** 3):.2f} GiB"
@@ -124,7 +126,6 @@ Disk (/): {disk_used} / {disk_total} ({disk_percent}%)
 
 Local IP: Hidden
 ```"""
-
     await m.reply_text(msg, quote=True)
 
 
@@ -210,7 +211,10 @@ async def del_admin_handler(c: Client, m: Message):
 
 
 def run_speedtest():
-    s = speedtest.Speedtest()
+    if not SPEEDTEST_AVAILABLE:
+        raise Exception("speedtest-cli modulü yüklü değil!")
+
+    s = speedtest.Speedtest(secure=True)
     s.get_best_server()
     s.download()
     s.upload()
@@ -221,11 +225,26 @@ async def speedtest_handler(c: Client, m: Message):
     if not await is_admin(m.from_user.id):
         return
 
-    status_msg = await m.reply_text("🚀 **Speedtest running...** (This may take 30s)", quote=True)
+    status_msg = await m.reply_text(
+        "🚀 **Hız testi başlatılıyor...**\n"
+        "⏳ _Bu işlem sunucu yoğunluğuna göre 30-60 saniye sürebilir._",
+        quote=True
+    )
 
     try:
         img_url = await c.loop.run_in_executor(None, run_speedtest)
-        await m.reply_photo(photo=img_url, caption="✅ **Speedtest Completed!**")
+
+        await m.reply_photo(
+            photo=img_url,
+            caption=f"✅ **Speedtest Tamamlandı!**\n@{c.me.username}"
+        )
         await status_msg.delete()
+
     except Exception as e:
-        await status_msg.edit_text(f"⚠️ Speedtest failed: {str(e)}")
+        error_text = str(e)
+        if "HTTP Error 403" in error_text:
+            error_text = "Speedtest sunucuları şu an yanıt vermiyor (API Limit/Ban)."
+        elif "Unable to connect" in error_text:
+            error_text = "Sunucuya bağlanılamadı."
+
+        await status_msg.edit_text(f"⚠️ **Hız testi hatası:**\n`{error_text}`")
