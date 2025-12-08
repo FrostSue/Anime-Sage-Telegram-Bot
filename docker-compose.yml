@@ -7,6 +7,5 @@ services:
       - .env
     volumes:
       - ./data:/app/data
-      - ./anime_sage_session.session:/app/anime_sage_session.session
     environment:
       - PYTHONUNBUFFERED=1
