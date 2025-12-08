@@ -1,6 +1,7 @@
 {
     "welcome": "Hello {name}! Welcome to Anime Sage. I am your AI-powered anime guide.",
     "help_text": "📜 **Command List**:\n\n🤖 **Core Commands**\n/recommend [request] - Get recommendation\n/mood - Set your mood\n/genre - Set favorite genre\n\n⚙️ **Settings**\n/settings - View profile & settings\n/resetprefs - Reset preferences\n\n📊 **Misc**\n/stats - Statistics\n/help - Show this menu",
+    "help_text_admin": "📜 **ADMIN Command List**:\n\n🤖 **User Commands**\n/recommend [request] - Get recs\n/mood, /genre, /settings - Preferences\n\n🔒 **Admin Panel**\n/adminpanel - Overview\n/server - Server Resources\n/logs - System Logs\n\n👑 **Access Management**\n/addadmin [ID] - Add Admin\n/deladmin [ID] - Remove Admin",
     "reset_done": "🔄 Preferences reset.",
     "stats_msg": "📊 **Your Statistics**\n\n🔍 Total recommendations received: **{total}**",
     "admin_only": "❌ Only admins can use this command.",
