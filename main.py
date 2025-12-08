@@ -12,9 +12,16 @@ from handlers.recommend import recommend_handler
 from handlers.preferences import mood_menu_handler, genre_menu_handler, show_profile, reset_prefs, pref_callback_handler
 from handlers.help import help_handler
 from handlers.stats import stats_handler
-from handlers.admin import admin_panel
+from handlers.admin import admin_panel, server_info, log_file_handler
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("anime_sage.log"),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
@@ -24,16 +31,11 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip()]
 
 async def main():
-    logger.info("Veritabani baslatiliyor...")
     await init_db()
-    
-    logger.info("Diller yukleniyor...")
     load_languages()
 
     app = Client("data/anime_sage_session", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
-    logger.info("Komutlar sisteme kaydediliyor...")
-    
     app.add_handler(MessageHandler(start_handler, filters.command("start")))
     app.add_handler(MessageHandler(language_command_handler, filters.command("language")))
     app.add_handler(CallbackQueryHandler(lang_callback_handler, filters.regex(r"^setlang_")))
@@ -49,11 +51,12 @@ async def main():
 
     app.add_handler(MessageHandler(help_handler, filters.command("help")))
     app.add_handler(MessageHandler(stats_handler, filters.command("stats")))
+    
     app.add_handler(MessageHandler(admin_panel, filters.command("adminpanel")))
+    app.add_handler(MessageHandler(server_info, filters.command("server")))
+    app.add_handler(MessageHandler(log_file_handler, filters.command("logs")))
 
     async with app:
-        me = await app.get_me()
-        logger.info(f"ANIME SAGE AKTIF: @{me.username}")
         await set_bot_commands(app)
         await idle()
 
