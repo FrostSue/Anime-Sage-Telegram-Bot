@@ -3,7 +3,7 @@ from pyrogram.types import Message
 from database.db import get_user_data, increment_stats
 from utils.languages import t
 from utils.auth import check_user_registration
-from services.ai import generate_anime_recommendation
+from services.ai import generate_anime_recommendation, get_anime_info
 
 async def recommend_handler(c: Client, m: Message):
     is_valid, lang = await check_user_registration(c, m)
@@ -29,3 +29,19 @@ async def recommend_handler(c: Client, m: Message):
     await increment_stats(user_id)
     await wait_msg.delete()
     await m.reply_text(f"{recommendation}", quote=True)
+
+async def anime_info_handler(c: Client, m: Message):
+    is_valid, lang = await check_user_registration(c, m)
+    if not is_valid: return
+
+    if len(m.command) < 2:
+        await m.reply_text(t("anime_info_usage", lang), quote=True)
+        return
+
+    anime_name = " ".join(m.command[1:])
+    wait_msg = await m.reply_text(t("searching", lang), quote=True)
+
+    info = await get_anime_info(anime_name, lang)
+    
+    await wait_msg.delete()
+    await m.reply_text(info, quote=True)
