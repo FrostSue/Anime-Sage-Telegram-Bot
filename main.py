@@ -12,6 +12,7 @@ from handlers.recommend import recommend_handler
 from handlers.preferences import mood_menu_handler, genre_menu_handler, show_profile, reset_prefs, pref_callback_handler
 from handlers.help import help_handler
 from handlers.stats import stats_handler
+from handlers.recommend import recommend_handler, anime_info_handler
 from handlers.admin import admin_panel, server_info, log_file_handler, add_admin_handler, del_admin_handler, speedtest_handler
 
 logging.basicConfig(
@@ -47,7 +48,7 @@ async def main():
     app.add_handler(CallbackQueryHandler(pref_callback_handler, filters.regex(r"^(set_|cancel_)")))
     app.add_handler(MessageHandler(help_handler, filters.command("help")))
     app.add_handler(MessageHandler(stats_handler, filters.command("stats")))
-    
+    app.add_handler(MessageHandler(anime_info_handler, filters.command("anime")))
     app.add_handler(MessageHandler(admin_panel, filters.command("adminpanel")))
     app.add_handler(MessageHandler(server_info, filters.command("server")))
     app.add_handler(MessageHandler(log_file_handler, filters.command("logs")))

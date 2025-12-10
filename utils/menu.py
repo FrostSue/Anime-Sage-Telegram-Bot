@@ -10,6 +10,7 @@ async def set_bot_commands(app):
         BotCommand("settings", "My Profile & Settings"),
         BotCommand("resetprefs", "Reset Preferences"),
         BotCommand("help", "Command List"),
-        BotCommand("stats", "Statistics")
+        BotCommand("stats", "Statistics"),
+        BotCommand("anime", "Anime Info / Bilgi")
     ]
     await app.set_bot_commands(commands)
