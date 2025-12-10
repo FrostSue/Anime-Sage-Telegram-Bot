@@ -36,5 +36,10 @@
     "genre_shonen": "Shonen 👊",
     "genre_seinen": "Seinen 🍷",
     "genre_isekai": "Isekai 🌀",
-    "genre_sliceoflife": "Yaşamdan Kesitler 🍃"
+    "genre_sliceoflife": "Yaşamdan Kesitler 🍃",
+
+    "anime_info_usage": "⚠️ Lütfen bir anime ismi yazın.\nÖrnek: `/anime Naruto`",
+    "searching": "🔍 **Anime Sage veri tabanını tarıyor...**",
+    "help_text": "📜 **Komut Listesi**\n──────────────────────\n🤖 **Ana Komutlar**\n/recommend [istek] - Anime önerisi al\n/anime [isim] - Anime hakkında bilgi al\n/mood - Ruh halini seç\n/genre - Sevdiğin türü seç\n... (gerisi aynı)"
+    
 }

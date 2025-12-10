@@ -36,5 +36,10 @@
     "genre_shonen": "Shonen 👊",
     "genre_seinen": "Seinen 🍷",
     "genre_isekai": "Isekai 🌀",
-    "genre_sliceoflife": "Slice of Life 🍃"
+    "genre_sliceoflife": "Slice of Life 🍃",
+
+    "anime_info_usage": "⚠️ Please provide an anime name.\nExample: `/anime Naruto`",
+    "searching": "🔍 **Anime Sage is searching the archives...**",
+    "help_text": "📜 **Command List**\n──────────────────────\n🤖 **Core Commands**\n/recommend [request] - Get recommendation\n/anime [name] - Get anime info\n/mood - Set your mood\n/genre - Set favorite genre\n... (gerisi aynı)"
+    
 }
