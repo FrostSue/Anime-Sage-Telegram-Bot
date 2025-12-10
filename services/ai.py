@@ -80,3 +80,47 @@ async def generate_anime_recommendation(user_input: str, mood: str, genres: str,
             if "404" in error_msg: return "⚠️ Model is under maintenance."
             if "429" in error_msg: return "⚠️ Too many requests, please wait."
             return "⚠️ Connection error occurred."
+        
+
+async def get_anime_info(anime_name: str, lang: str) -> str:
+    """
+    Belirtilen anime hakkında detaylı bilgi verir.
+    """
+    try:
+        async with AsyncGroq(api_key=GROQ_API_KEY) as client:
+            
+            lang_name = "Turkish" if lang == "tr" else "English"
+            
+            system_instruction = (
+                f"You are Anime Sage, an expert Anime Encyclopedia.\n"
+                f"Task: Provide detailed information about the anime requested by the user.\n\n"
+                
+                f"🚨 **CRITICAL RULES** 🚨\n"
+                f"1. **NO TRANSLATED TITLES**: Use the original Japanese Romaji or official English title. NEVER translate the title into Turkish.\n"
+                f"2. **FORMAT**: State if it is TV, Movie, OVA, etc.\n"
+                f"3. **SPOILER FREE**: Provide a compelling summary without spoiling key plot points.\n"
+                f"4. **LANGUAGE**: Write the description and labels in {lang_name}, but keep the Title and Studio names original.\n\n"
+                
+                f"📝 **OUTPUT FORMAT**:\n"
+                f"🎬 **Title** (Year) - [Format]\n"
+                f"🏢 Studio: X\n"
+                f"⭐ Score: X/10\n"
+                f"🎭 Genre: A, B\n"
+                f"📜 **Status:** Finished / Airing\n"
+                f"📝 **Synopsis:** Write a concise, engaging summary (2-3 sentences) in {lang_name}."
+            )
+
+            completion = await client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": system_instruction},
+                    {"role": "user", "content": f"Tell me about this anime: {anime_name}"}
+                ],
+                model=GROQ_MODEL,
+                temperature=0.5,
+                max_tokens=450,
+            )
+
+            return completion.choices[0].message.content.strip()
+
+    except Exception as e:
+        return f"⚠️ Error: {str(e)}"
