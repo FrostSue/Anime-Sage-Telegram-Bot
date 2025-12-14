@@ -22,6 +22,14 @@ async def init_db():
                 user_id INTEGER PRIMARY KEY
             )
         """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                anime_name TEXT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
         await db.commit()
 
 async def register_user(user_id: int):
@@ -83,5 +91,25 @@ async def del_sudo(user_id: int):
 async def get_sudoers():
     async with aiosqlite.connect(DB_PATH) as db:
         async with db.execute("SELECT user_id FROM sudoers") as cursor:
+            rows = await cursor.fetchall()
+            return [row[0] for row in rows]
+
+async def add_to_history(user_id: int, anime_name: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("INSERT INTO history (user_id, anime_name) VALUES (?, ?)", (user_id, anime_name))
+        await db.execute("""
+            DELETE FROM history 
+            WHERE id NOT IN (
+                SELECT id FROM history 
+                WHERE user_id = ? 
+                ORDER BY timestamp DESC 
+                LIMIT 20
+            ) AND user_id = ?
+        """, (user_id, user_id))
+        await db.commit()
+
+async def get_user_history(user_id: int) -> list:
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT anime_name FROM history WHERE user_id = ?", (user_id,)) as cursor:
             rows = await cursor.fetchall()
             return [row[0] for row in rows]
