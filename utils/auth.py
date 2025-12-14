@@ -11,10 +11,15 @@ async def check_user_registration(c: Client, m: Message) -> tuple[bool, str]:
         bot_username = (await c.get_me()).username
         deep_link = f"https://t.me/{bot_username}?start=register"
         
-        msg_text = t("not_registered", "en", link=deep_link)
+        msg_text = (
+            "⚠️ **Registration Required / Kayıt Gerekli**\n\n"
+            "🇹🇷 Lütfen dil seçimi yapmak için botu başlatın.\n"
+            "🇬🇧 Please start the bot to select your language.\n\n"
+            "👇 **Click Below / Aşağıya Tıkla**"
+        )
         
         kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🚀 Start / Başlat", url=deep_link)]
+            [InlineKeyboardButton("🚀 Start Bot / Botu Başlat", url=deep_link)]
         ])
         
         await m.reply_text(msg_text, reply_markup=kb, quote=True, disable_web_page_preview=True)
